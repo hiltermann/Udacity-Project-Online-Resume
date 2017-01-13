@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 /*
 Object containing personal bio information, which can be used to display on resume.
  */
@@ -51,12 +52,12 @@ var projects = {
         "title": "Digital Resume",
         "dates": "2016",
         "description": "Created digital resume as part of the Introduction to Programming NanoDegree",
-        "image": "images/donald.png"
+        "images": ["images/donald.png", "images/dagobert.png"]
     }, {
         "title": "Wedding Website",
         "dates": "2013",
         "description": "Designed and created our wedding website",
-        "image": "images/dagobert.png"
+        "images": ["images/dagobert.png", "images/donald.png"]
     }]
 };
 
@@ -94,9 +95,9 @@ var education = {
 
 bio.display = function() {
     /*
-	The display method in the bio object, function inserts all available information in 
-	the bio object into the resume (index.html) header. 
- 	*/
+    The display method in the bio object, function inserts all available information in 
+    the bio object into the resume (index.html) header. 
+    */
 
     $("#header").prepend(formatInput(bio.name, HTMLheaderName) +
         formatInput(bio.role, HTMLheaderRole));
@@ -113,6 +114,8 @@ bio.display = function() {
             $("#skills").append(formattedSkills);
         }
     }
+    // add the contact details to the bottom of the page.
+    bio.displayContact("#footerContacts");
 };
 bio.displayContact = function(htmlId) {
     /* 
@@ -149,8 +152,11 @@ projects.display = function() {
         $("#projects").append(HTMLprojectStart);
         $(".project-entry:last").append(formatInput(projects.projects[i].title, HTMLprojectTitle) +
             formatInput(projects.projects[i].dates, HTMLprojectDates) +
-            formatInput(projects.projects[i].description, HTMLprojectDescription) +
-            formatInput(projects.projects[i].image, HTMLprojectImage));
+            formatInput(projects.projects[i].description, HTMLprojectDescription));
+
+        for (var x = 0; x < projects.projects[i].images.length; x++) {
+            $(".project-entry:last").append(formatInput(projects.projects[i].images[x], HTMLprojectImage));
+        }
     }
 };
 
@@ -161,7 +167,8 @@ education.display = function() {
     */
     for (var i = 0; i < education.schools.length; i++) {
         $("#education").append(HTMLschoolStart);
-        $(".education-entry:last").append(formatInput(education.schools[i].name, HTMLschoolName) +
+        $(".education-entry:last").append(formatInput(education.schools[i].url,
+                formatInput(education.schools[i].name, HTMLschoolName), "#") +
             formatInput(education.schools[i].degree, HTMLschoolDegree) +
             formatInput(education.schools[i].dates, HTMLschoolDates) +
             formatInput(education.schools[i].location, HTMLschoolLocation) +
@@ -189,19 +196,16 @@ work.display();
 projects.display();
 education.display();
 
-// add the contact details to the bottom of the page.
-bio.displayContact("#footerContacts");
-
 // adding the google map with place locators for places lived and worked.
 $("#mapDiv").append(googleMap);
 
-function formatInput(inputStr, sourceHtml) {
+function formatInput(inputStr, sourceHtml, replaceStr = "%data%") {
     /* 
     Function that verifies whether an input is defined (has content) 
     and returns the respective formated HTML content or an empty string.
     */
     if (inputStr.length > 0) {
-        return sourceHtml.replace("%data%", inputStr);
+        return sourceHtml.replace(replaceStr, inputStr);
     }
     return "";
 }
